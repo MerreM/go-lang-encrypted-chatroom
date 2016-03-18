@@ -2,9 +2,9 @@
 package main
 
 import (
-	"chatimpl/chatroom"
 	"flag"
 	"fmt"
+	"go-lang-encrypted-chatroom/chatroom"
 	"log"
 	"net"
 )
