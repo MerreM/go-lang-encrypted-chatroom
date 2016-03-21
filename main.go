@@ -10,18 +10,18 @@ import (
 )
 
 func main() {
-	port := flag.Int("l", 0, "Listen mode. Specify port")
+	listenPort := flag.Int("l", 0, "Listen mode. Specify port")
+	sendPort := flag.Int("c", 0, "Client mode. Specify port")
 	flag.Parse()
 	// Server mode
-	if *port != 0 {
-		l, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	if *listenPort != 0 {
+		l, err := net.Listen("tcp", fmt.Sprintf(":%d", *listenPort))
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer l.Close()
 		log.Fatal(chatroom.Serve(l))
 	} else {
-		chatroom.Client()
+		chatroom.Client(*sendPort)
 	}
-
 }

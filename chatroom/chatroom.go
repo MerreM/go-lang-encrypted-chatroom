@@ -2,9 +2,12 @@
 package chatroom
 
 import (
+	"bytes"
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 
@@ -181,5 +184,37 @@ func continousRead(reader io.Reader, output chan []byte, errors chan error) {
 		if n > 0 {
 			output <- data
 		}
+	}
+}
+
+func Serve(socket net.Listener) error {
+	for {
+		conn, err := socket.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+		go func(c net.Conn) {
+			res, err := ioutil.ReadAll(c)
+			if err != nil {
+				panic(err)
+			}
+			log.Print(fmt.Sprintf("%s", string(res)))
+			bufferedReader := bytes.NewReader(res)
+			io.Copy(c, bufferedReader)
+			c.Close()
+		}(conn)
+	}
+}
+
+func Client(port int) {
+	remoteAddr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("127.0.0.1:%v", port))
+	if err != nil {
+		panic(err)
+	}
+	connection, err := net.DialTCP("tcp", nil, remoteAddr)
+	defer connection.Close()
+	_, err = connection.Write([]byte("Hello"))
+	if err != nil {
+		panic(err)
 	}
 }
